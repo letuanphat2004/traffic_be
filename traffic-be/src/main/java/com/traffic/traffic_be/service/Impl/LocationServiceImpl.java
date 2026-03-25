@@ -25,13 +25,12 @@ public class LocationServiceImpl implements LocationService {
     private final FavoriteLocationRepository locationRepository;
     private final SearchHistoryRepository searchHistoryRepository;
 
+    @Override
     public void addFavoriteLocation(LocationRequest request) {
-        // 1. Lấy username của người đang đăng nhập từ Token
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username)
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
 
-        // 2. Kiểm tra trùng lặp (nếu cần)
         if (locationRepository.existsByLatitudeAndLongitudeAndUser(request.getLatitude(), request.getLongitude(), user)) {
             throw new RuntimeException("Địa điểm này đã có trong danh sách yêu thích!");
         }
@@ -50,8 +49,8 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public List<LocationResponse> getMyFavoriteLocations() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username)
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
 
         return locationRepository.findByUser(user).stream()
@@ -67,12 +66,12 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public void saveSearchHistory(LocationRequest request) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username)
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
 
         SearchHistory history = SearchHistory.builder()
-                .query(request.getName()) // Giả sử tên địa điểm là nội dung tìm kiếm
+                .keyword(request.getName())
                 .address(request.getAddress())
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
@@ -84,22 +83,20 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public List<LocationResponse> getRecentSearches() {
-
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username)
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
 
-        // Lấy 10 địa điểm gần nhất
+
         Pageable topTen = PageRequest.of(0, 10);
         return searchHistoryRepository.findByUserOrderByCreatedAtDesc(user, topTen).stream()
                 .map(h -> LocationResponse.builder()
                         .id(h.getId())
-                        .name(h.getQuery())
+                        .name(h.getKeyword())
                         .address(h.getAddress())
                         .latitude(h.getLatitude())
                         .longitude(h.getLongitude())
                         .build())
                 .collect(Collectors.toList());
     }
-
 }

@@ -1,7 +1,17 @@
 spring:
   application:
     name: traffic-be
-
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: phatletuan153@gmail.com
+    password: axjyjetrxfpxuhep
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   datasource:
     url: jdbc:mysql://localhost:3306/traffic_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root

@@ -1,4 +1,5 @@
 package com.traffic.traffic_be.service.Impl;
+
 import com.traffic.traffic_be.entity.User;
 import com.traffic.traffic_be.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,15 +13,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy user: " + username));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy user với email: " + email));
 
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword())   // password đã BCrypt trong DB
-                .authorities("ROLE_USER")       // tạm thời fix cứng ROLE_USER
+                .withUsername(user.getEmail())
+                .password(user.getPassword())
+                .authorities("ROLE_USER")
                 .build();
     }
 }

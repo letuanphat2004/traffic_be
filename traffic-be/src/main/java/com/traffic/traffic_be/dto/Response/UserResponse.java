@@ -6,7 +6,9 @@ import lombok.Data;
 @Data
 @Builder
 public class UserResponse {
-    private String username;
-    private String fullName;
     private String email;
+    private String fullName;
+    private String phone;
+    private String avatarUrl;
+    private boolean isActive;
 }

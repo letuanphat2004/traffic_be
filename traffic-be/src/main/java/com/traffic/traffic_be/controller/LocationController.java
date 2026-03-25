@@ -30,6 +30,14 @@ public class LocationController {
     public ResponseEntity<List<LocationResponse>> getFavorites() {
         return ResponseEntity.ok(locationService.getMyFavoriteLocations());
     }
+
+    @PostMapping("/history")
+    @Operation(summary = "Lưu vào lịch sử tìm kiếm (Cần Token)")
+    public ResponseEntity<String> saveSearchHistory(@RequestBody LocationRequest request) {
+        locationService.saveSearchHistory(request);
+        return ResponseEntity.ok("Đã lưu vào lịch sử tìm kiếm!");
+    }
+
     @GetMapping("/recent")
     @Operation(summary = "Lấy danh sách tìm kiếm gần đây (Cần Token)")
     public ResponseEntity<List<LocationResponse>> getRecent() {
